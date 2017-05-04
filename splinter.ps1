@@ -1,5 +1,6 @@
 $server = "http://127.0.0.1:8080"
-$polltime = Get-Random -Minimum 15 -Maximum 25
+$pollmin = 15
+$pollmax = 25
 $terminationdate = Get-Date -Date "2020-01-01 00:00:00"
 $targetdomain = "TARGETDOMAIN"
 $markercontents = "If found, please contact XXX"
@@ -28,6 +29,7 @@ while((Get-Date)  -lt $terminationdate)
     $output = ""
 
     # Sleep (with random time)
+    $polltime = Get-Random -Minimum $pollmin -Maximum $pollmax
     sleep $polltime
 
     # Output a dot each time a request is made
