@@ -1,6 +1,5 @@
 # splinter
-Powershell RAT, with a PoC (single threaded) Python-based server.
-NB: the RAT should really be used with a custom server with a backend database - the included server is for demonstration purposes only. 
+Powershell RAT, with a Python-based (CherryPy) server and sqlite backend.
 
 Splinter has the following environment checks/controls built-in:
 
