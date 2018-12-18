@@ -38,7 +38,7 @@ def main():
                 vc = input(">> ")
                     
                 if vc == 'c' or vc == 'command':
-                    print("Enter the command(s) you wish to run in PowerShell syntax below - Ctrl-D or Ctrl-Z ( windows ) to end\n")
+                    print("Enter the command(s) you wish to run in PowerShell syntax below - Ctrl-D or Ctrl-Z ( Windows ) to end\n")
                     contents = []
                     while True:
                         try:
@@ -47,12 +47,11 @@ def main():
                             break
                         contents.append(line)
                     id = command(uuid,'\n'.join(contents))
-                    print("Command accepted as ID",id)
+                    print("\nCommand accepted as ID {}\n".format(id))
                      
                 if vc == 'lc' or vc == 'last_commands':
                     tab = texttable.Texttable()
                     tab.header(['ID','Command Issue Time','Polled Time','Response Time','Command'])
-                    print(last_commands(5,uuid))
                     for lc in last_commands(5,uuid):
                         tab.add_row(lc)
                     print(tab.draw())
