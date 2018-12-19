@@ -46,7 +46,12 @@ while((Get-Date)  -lt $terminationdate)
             if ($command) {
                 $job = start-job -scriptblock {
                     param($c)
-                    Invoke-Expression ($c) | out-string 
+                    try {
+                        Invoke-Expression ($c) | out-string 
+                    }
+                    catch {
+                        $_.Exception.message
+                    }
                 } -Arg $command
                 if (wait-job $job -Timeout $timeout) {
                     $output = receive-job $job
